@@ -13,15 +13,23 @@ class Figure {
     changeDirection() {
         let randomVelocity = Math.random();
         if (this.velocityX > 0 && this.velocityY > 0) {
+            this.x-=5;
+            this.y-=5;
             this.velocityX = -randomVelocity * this.speed;
             this.velocityY = (-1 + randomVelocity) * this.speed;
         } else if (this.velocityX > 0 && this.velocityY < 0) {
+            this.x-=5;
+            this.y+=5;
             this.velocityX = -randomVelocity * this.speed;
             this.velocityY = (1 - randomVelocity) * this.speed;
         } else if (this.velocityX < 0 && this.velocityY < 0) {
+            this.x+=5;
+            this.y+=5;
             this.velocityX = randomVelocity * this.speed;
             this.velocityY = (1 - randomVelocity) * this.speed;
         } else {
+            this.x+=5;
+            this.y-=5;
             this.velocityX = randomVelocity * this.speed;
             this.velocityY = (-1 + randomVelocity) * this.speed;
         }
@@ -42,12 +50,12 @@ class Circle extends Figure {
         context.stroke();
         this.update(canvas);
     }
-    clear(context) {
+    clear(context, size) {
         context.beginPath();
         context.fillStyle = "#ddd";
         context.lineWidth = 5;
         context.strokeStyle = "#ddd";
-        context.arc(this.x - this.velocityX, this.y - this.velocityY, this.radius + 5, 0, 2 * Math.PI, true);
+        context.arc(this.x - this.velocityX, this.y - this.velocityY, this.radius + size, 0, 2 * Math.PI, true);
         context.fill();
         context.stroke();
     }
@@ -91,12 +99,12 @@ class Square extends Figure {
         context.stroke();
         this.update(canvas);
     }
-    clear(context) {
+    clear(context,size) {
         context.beginPath();
         context.fillStyle = "#ddd";
         context.lineWidth = 5;
         context.strokeStyle = "#ddd";
-        context.rect(this.x - 5, this.y - 5, this.width + 10, this.width + 10);
+        context.rect(this.x - size, this.y - size, this.width + size*2, this.width + size*2);
         context.fill();
         context.stroke();
     }
@@ -124,20 +132,16 @@ class Square extends Figure {
         this.y += this.velocityY;
     }
 }
-function trackCollisions(arr) {
+function trackCollisions(context,arr) {
     for (let i = 0; i < arr.length; i++) {
         for (let j = i + 1; j < arr.length; j++) {
             if (arr[j].number != arr[i].number) {
                 if (arr[j].type == arr[i].type && arr[j].radius) {
                     if (arr[i].radius + arr[j].radius + 10 > Math.sqrt(Math.pow(arr[i].x - arr[j].x, 2) + Math.pow(arr[i].y - arr[j].y, 2))) {
-
                         arr[i].changeDirection();
+                        arr[i].clear(context,7);
                         arr[j].velocityX = -arr[i].velocityX;
                         arr[j].velocityY = -arr[i].velocityY;
-                        //arr[i].velocityX = -arr[i].velocityX;
-                        // arr[i].velocityY = -arr[i].velocityY;
-                        //arr[j].velocityX = -arr[j].velocityX;
-                        //arr[j].velocityY = -arr[j].velocityY;
                         return;
                     }
                 } else if (arr[j].type == arr[i].type && arr[j].width) {
@@ -188,15 +192,14 @@ function init() {
     }, 5000);
     setInterval(() => {
         for (let i = 0; i < figures.length; i++) {
-            figures[i].clear(context);
-            //context.clearRect(circles[i].x - circles[i].radius - 10, circles[i].y - circles[i].radius - 10, circles[i].x + circles[i].radius + 10, circles[i].y + circles[i].radius + 10);
+            figures[i].clear(context,5);
             figures[i].draw(context, canvas);
         }
 
     }, 4);
 
     setInterval(() => {
-        trackCollisions(figures);
+        trackCollisions(context,figures);
     }, 10);
 }
 
